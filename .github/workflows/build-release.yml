@@ -6,6 +6,15 @@ name: Build Release
 
 on:
   workflow_dispatch:
+    inputs:
+      publish:
+        description: 'Publish a GitHub release from this run (no tag push needed)'
+        type: boolean
+        default: false
+      tag:
+        description: 'Tag for the forced release.  Created at this commit if it does not exist.  Blank means 2HOL_v<data version>-build<run number>, published as a prerelease.'
+        type: string
+        default: ''
   push:
     tags:
       - '2HOL_v*'
@@ -20,6 +29,8 @@ jobs:
 
   build-linux-windows:
     runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
     steps:
       - name: Checkout OneLife
         uses: actions/checkout@v4
@@ -192,9 +203,10 @@ jobs:
 
   release:
     needs: [build-linux-windows, build-mac]
-    # Only publish for tag pushes; workflow_dispatch runs still produce
-    # downloadable artifacts for testing.
-    if: startsWith(github.ref, 'refs/tags/')
+    # Tag pushes publish automatically.  A workflow_dispatch run only produces
+    # downloadable artifacts unless it is dispatched with publish=true, which
+    # forces a release without waiting on release.yml to push a tag.
+    if: startsWith(github.ref, 'refs/tags/') || inputs.publish
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -204,10 +216,34 @@ jobs:
         with:
           path: artifacts
 
+      # A tag push names itself.  A forced run uses the tag typed at dispatch,
+      # or falls back to a per-run prerelease tag that cannot collide with a
+      # real release.
+      - name: Resolve tag
+        id: tag
+        env:
+          INPUT_TAG: ${{ inputs.tag }}
+          VERSION: ${{ needs.build-linux-windows.outputs.version }}
+        run: |
+          set -e
+          if [ "${{ github.ref_type }}" = tag ]; then
+            echo "name=${{ github.ref_name }}" >> $GITHUB_OUTPUT
+            echo "prerelease=" >> $GITHUB_OUTPUT
+          elif [ -n "$INPUT_TAG" ]; then
+            echo "name=$INPUT_TAG" >> $GITHUB_OUTPUT
+            echo "prerelease=" >> $GITHUB_OUTPUT
+          else
+            echo "name=2HOL_v${VERSION}-build${{ github.run_number }}" >> $GITHUB_OUTPUT
+            echo "prerelease=--prerelease" >> $GITHUB_OUTPUT
+          fi
+
       - name: Create release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          TAG: ${{ github.ref_name }}
+          # This job has no checkout, so gh needs to be told which repo it acts on
+          GH_REPO: ${{ github.repository }}
+          TAG: ${{ steps.tag.outputs.name }}
+          PRERELEASE: ${{ steps.tag.outputs.prerelease }}
         run: |
           cat > notes.md <<'NOTES'
           ## Downloads
@@ -232,8 +268,19 @@ jobs:
           included on macOS.
           NOTES
 
-          gh release create "$TAG" \
-            --title "$TAG" \
-            --notes-file notes.md \
-            artifacts/release-linux-windows/*.zip \
-            artifacts/release-mac/*.zip
+          # Re-running a forced build against an existing tag replaces its
+          # zips rather than failing on the already-published release.
+          if gh release view "$TAG" > /dev/null 2>&1; then
+            gh release upload "$TAG" \
+              artifacts/release-linux-windows/*.zip \
+              artifacts/release-mac/*.zip \
+              --clobber
+          else
+            gh release create "$TAG" \
+              --title "$TAG" \
+              --notes-file notes.md \
+              --target "$GITHUB_SHA" \
+              $PRERELEASE \
+              artifacts/release-linux-windows/*.zip \
+              artifacts/release-mac/*.zip
+          fi
