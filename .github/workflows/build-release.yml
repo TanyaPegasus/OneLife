@@ -49,6 +49,7 @@ jobs:
             rsync wget unzip zip git \
             imagemagick \
             libglu1-mesa-dev libgl1-mesa-dev libsdl1.2-dev \
+            libpng-dev zlib1g-dev \
             mingw-w64 build-essential
 
       # Cross-compiled SDL, zlib and libpng for the Windows target.  Built from
