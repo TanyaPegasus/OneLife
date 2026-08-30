@@ -4309,7 +4309,6 @@ LivingLifePage::LivingLifePage()
     KeybindManager::registerAction( "eatSelf", "EAT/SELF", "e", { .preComment = "// Player actions" } );
     KeybindManager::registerAction( "removeClothing", "REMOVE CLOTHING", "shift+e" );
     KeybindManager::registerAction( "pickUpBaby", "PICK UP BABY", "c" );
-    KeybindManager::registerAction( "heldUse", "HELD USE", "e", { .postComment = "" } );
 
     KeybindManager::registerAction( "coordinatesToggle", "COORDINATES PANEL", "g", { .preComment = "// Panels" } );
     KeybindManager::registerAction( "yumFinder", "YUM FINDER", "y" );
@@ -4331,7 +4330,9 @@ LivingLifePage::LivingLifePage()
     KeybindManager::registerAction( "hintBack", "HINT BACK", "z" );
     KeybindManager::registerAction( "nameLabels", "PLAYER NAMES", "n" );
     KeybindManager::registerAction( "stopCamera", "STOP CAMERA", "f" );
-    KeybindManager::registerAction( "gridToggle", "GRID TOGGLE", "shift+k" );
+    KeybindManager::registerAction( "gridToggle", "GRID TOGGLE", "shift+k", { .postComment = "" });
+
+    KeybindManager::registerAction( "modKey", "MOD KEY", "e", { .type = KEY_ONLY, .preComment = "// Hold to make left clicks act as right clicks when keyboard actions are disabled.\n// Requires eKeyForRightClick.ini = 1." } );
 
 
 
@@ -29048,7 +29049,9 @@ void LivingLifePage::keybindKeyDown( int inKey ) {
             }
         }
 
-    if( !mSayField.isFocused() && KeybindManager::isActive( "heldUse" ) ) mModClickKeyDown = true;
+    if( !mSayField.isFocused() &&
+        !SettingsManager::getIntSetting( "keyboardActions", 1 ) &&
+        KeybindManager::isActive( "modKey" ) ) mModClickKeyDown = true;
 
     if( SettingsManager::getIntSetting( "keyboardActions", 1 ) ) {
         if( !mSayField.isFocused() && !vogMode ) {
@@ -29257,7 +29260,7 @@ void LivingLifePage::keybindKeyUp( int inKey ) {
     if( KeybindManager::isReleased( "xray" ) ) mXrayKeyDown = false;
     if( KeybindManager::isReleased( "hintBack" ) ) mHintBackKeyDown = false;
     if( KeybindManager::isReleased( "hideHud" ) ) mHideHudKeyDown = false;
-    if( KeybindManager::isReleased( "heldUse" ) ) mModClickKeyDown = false;
+    if( KeybindManager::isReleased( "modKey" ) ) mModClickKeyDown = false;
 
     if( KeybindManager::isReleased( "stopCamera" ) ) shouldMoveCamera = true;
     }
