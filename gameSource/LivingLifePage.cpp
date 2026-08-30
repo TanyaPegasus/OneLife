@@ -53,6 +53,7 @@
 #include <stdlib.h>//#include <math.h>
 #include <string>
 #include <fstream>
+#include <sstream>
 
 
 #define OHOL_NON_EDITOR 1
@@ -8187,9 +8188,9 @@ void LivingLifePage::draw( doublePair inViewCenter,
     setDrawColor( 1, 1, 1, 1 );
 
     int gridCenterX = 
-        lrintf( lastScreenViewCenter.x / CELL_D ) - mMapOffsetX + mMapD/2;
+        (int)lrintf( lastScreenViewCenter.x / CELL_D ) - mMapOffsetX + mMapD/2;
     int gridCenterY = 
-        lrintf( lastScreenViewCenter.y / CELL_D ) - mMapOffsetY + mMapD/2;
+        (int)lrintf( lastScreenViewCenter.y / CELL_D ) - mMapOffsetY + mMapD/2;
     
     //FOV
     // SIDE NOTE:  These 4 variables control how far items should be rendered, separately from biome drawing
@@ -9042,8 +9043,8 @@ void LivingLifePage::draw( doublePair inViewCenter,
 
     if( vogModeActuallyOn ) {
         GridPos viewingGridPos = {
-            lrintf( lastScreenViewCenter.x / CELL_D ),
-            lrintf( lastScreenViewCenter.y / CELL_D )
+            (int)lrintf( lastScreenViewCenter.x / CELL_D ),
+            (int)lrintf( lastScreenViewCenter.y / CELL_D )
             };
         FloatColor tileColor = {0.5, 0.0, 1.0, 1.0};
         if( vogScrollingMode ) tileColor = {1.0, 0.0, 1.0, 1.0};
@@ -25782,8 +25783,8 @@ void LivingLifePage::pointerMove( float inX, float inY ) {
             }
 
         GridPos viewingGridPos = {
-            lrintf( lastScreenViewCenter.x / CELL_D ),
-            lrintf( lastScreenViewCenter.y / CELL_D )
+            (int)lrintf( lastScreenViewCenter.x / CELL_D ),
+            (int)lrintf( lastScreenViewCenter.y / CELL_D )
             };
 
         if( // maxChunkDimension/2 is the border of loaded area
@@ -28192,8 +28193,8 @@ void LivingLifePage::keyDown( unsigned char inASCII ) {
                 if( vogMode ) {
 
                     GridPos viewingGridPos = {
-                        lrintf( lastScreenViewCenter.x / CELL_D ),
-                        lrintf( lastScreenViewCenter.y / CELL_D )
+                        (int)lrintf( lastScreenViewCenter.x / CELL_D ),
+                        (int)lrintf( lastScreenViewCenter.y / CELL_D )
                         };
 
                     if( viewingGridPos.x != lrint( vogPos.x ) || 
@@ -28763,8 +28764,8 @@ void LivingLifePage::keyDown( unsigned char inASCII ) {
                             // at the wrong position
                             
                             GridPos viewingGridPos = {
-                                lrintf( lastScreenViewCenter.x / CELL_D ),
-                                lrintf( lastScreenViewCenter.y / CELL_D )
+                                (int)lrintf( lastScreenViewCenter.x / CELL_D ),
+                                (int)lrintf( lastScreenViewCenter.y / CELL_D )
                                 };
 
                             if( viewingGridPos.x != lrint( vogPos.x ) || 
@@ -28876,8 +28877,8 @@ void LivingLifePage::specialKeyDown( int inKeyCode ) {
         if( posOffset.x != 0 || posOffset.y != 0 ) {
             
             GridPos newPos;
-            newPos.x = lrintf( lastScreenViewCenter.x / CELL_D );
-            newPos.y = lrintf( lastScreenViewCenter.y / CELL_D );
+            newPos.x = (int)lrintf( lastScreenViewCenter.x / CELL_D );
+            newPos.y = (int)lrintf( lastScreenViewCenter.y / CELL_D );
             
             newPos.x += posOffset.x;
             newPos.y += posOffset.y;
