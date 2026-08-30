@@ -1,5 +1,9 @@
 name: Build Release
 
+# Note: the following workflow is not representative of the current 2HOL build
+# process, where we rely on miniOneLifeCompile. It remains for forks that wish to make use of it.
+
+
 # Builds the client for Linux, Windows and macOS and attaches the zips to a
 # release.  Separate from release.yml, which only bumps dataVersionNumber and
 # pushes the tags -- this workflow reacts to the tag that one creates.
@@ -15,9 +19,9 @@ on:
         description: 'Tag for the forced release.  Created at this commit if it does not exist.  Blank means 2HOL_v<data version>-build<run number>, published as a prerelease.'
         type: string
         default: ''
-  push:
-    tags:
-      - '2HOL_v*'
+  # push:
+  #   tags:
+  #     - '2HOL_v*'
 
 env:
   # Resolves to this repo's owner, so the workflow can be tested in a fork
