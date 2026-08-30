@@ -4308,7 +4308,7 @@ LivingLifePage::LivingLifePage()
 
     KeybindManager::registerAction( "eatSelf", "EAT/SELF", "e", { .preComment = "// Player actions" } );
     KeybindManager::registerAction( "removeClothing", "REMOVE CLOTHING", "shift+e" );
-    KeybindManager::registerAction( "pickUpBaby", "PICK UP BABY", "c" );
+    KeybindManager::registerAction( "pickUpBaby", "PICK UP BABY", "c", { .postComment = "" } );
 
     KeybindManager::registerAction( "coordinatesToggle", "COORDINATES PANEL", "g", { .preComment = "// Panels" } );
     KeybindManager::registerAction( "yumFinder", "YUM FINDER", "y" );
