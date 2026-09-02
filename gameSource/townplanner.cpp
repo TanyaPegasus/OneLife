@@ -1737,7 +1737,11 @@ void specialKeyUp( int inKey ) {
     if( currentGamePage != NULL ) {
         currentGamePage->base_specialKeyUp( inKey );
         }
-    } 
+    }
+
+void unmodifiedKeyDown( unsigned char inASCII ) {}
+void unmodifiedKeyUp( unsigned char inASCII ) {}
+ 
 
 
 
